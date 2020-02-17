@@ -1,10 +1,13 @@
 package com.example.gorillagroove.client
 
 import android.util.Log
+import okhttp3.Call
+import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
@@ -14,12 +17,12 @@ private val client = OkHttpClient()
 private const val VERSION = "1.1.60"
 
 fun loginRequest(url: String, email: String, password: String): JSONObject {
-    val body = """{"email":"$email","password":"$password"}"""
+    val body = """{"email": "$email", "password": "$password"}"""
 
     val request = Request.Builder()
-        .url(url)
-        .post(RequestBody.create("application/json".toMediaTypeOrNull(), body))
-        .build()
+            .url(url)
+            .post(RequestBody.create("application/json".toMediaTypeOrNull(), body))
+            .build()
 
     var responseVal = JSONObject()
 
@@ -40,10 +43,10 @@ fun loginRequest(url: String, email: String, password: String): JSONObject {
 
 fun authenticatedGetRequest(url: String, token: String): JSONObject {
     val request = Request.Builder()
-        .url(url)
-        .get()
-        .addHeader("Authorization", "Bearer $token")
-        .build()
+            .url(url)
+            .get()
+            .addHeader("Authorization", "Bearer $token")
+            .build()
 
     var responseVal = JSONObject()
 
@@ -58,10 +61,10 @@ fun authenticatedGetRequest(url: String, token: String): JSONObject {
 
 fun playlistGetRequest(url: String, token: String): JSONArray {
     val request = Request.Builder()
-        .url(url)
-        .get()
-        .addHeader("Authorization", "Bearer $token")
-        .build()
+            .url(url)
+            .get()
+            .addHeader("Authorization", "Bearer $token")
+            .build()
 
     var responseVal = JSONArray()
 
@@ -82,22 +85,52 @@ fun updateDevice(url: String, token: String, deviceId: String) {
         |}
     """.trimMargin()
     val request = Request.Builder()
-        .url(url)
-        .put(RequestBody.create("application/json".toMediaTypeOrNull(), body))
-        .header("Authorization", "Bearer $token")
-        .build()
+            .url(url)
+            .put(RequestBody.create("application/json".toMediaTypeOrNull(), body))
+            .header("Authorization", "Bearer $token")
+            .build()
 
-    thread { client.newCall(request).execute() }.join()
+    thread {
+        client.newCall(request).enqueue(object : Callback {
+            // Fire and Forget
+            override fun onResponse(call: Call, response: Response) {}
+            override fun onFailure(call: Call, e: IOException) {}
+        })
+    }
 }
 
-fun listenedAndNowPlayingRequests(url: String, trackId: Long?, token: String, deviceId: String) {
+fun markListenedRequest(url: String, trackId: Long, token: String, deviceId: String) {
     val body = """{"trackId":$trackId,"deviceId":"$deviceId"}"""
     val request = Request.Builder()
-        .url(url)
-        .post(RequestBody.create("application/json".toMediaTypeOrNull(), body))
-        .header("Authorization", "Bearer $token")
-        .build()
-    Log.i("HttpClient", "Sending now playing or track listened request!")
+            .url(url)
+            .post(RequestBody.create("application/json".toMediaTypeOrNull(), body))
+            .header("Authorization", "Bearer $token")
+            .build()
 
-    thread { client.newCall(request).execute() }.join()
+    thread {
+        client.newCall(request).enqueue(object : Callback {
+            // Fire and Forget
+            override fun onResponse(call: Call, response: Response) {}
+            override fun onFailure(call: Call, e: IOException) {
+                // TODO: Have a retry policy or a queue of some sort to send listened requests later
+            }
+        })
+    }
+}
+
+fun nowPlayingRequest(url: String, trackId: Long?, token: String, deviceId: String) {
+    val body = """{"trackId":$trackId,"deviceId":"$deviceId"}"""
+    val request = Request.Builder()
+            .url(url)
+            .post(RequestBody.create("application/json".toMediaTypeOrNull(), body))
+            .header("Authorization", "Bearer $token")
+            .build()
+
+    thread {
+        client.newCall(request).enqueue(object : Callback {
+            // Fire and Forget
+            override fun onResponse(call: Call, response: Response) {}
+            override fun onFailure(call: Call, e: IOException) {}
+        })
+    }
 }
