@@ -188,17 +188,14 @@ export default function TrackSourceList(props) {
 				<span>Remote Play</span>
 			</div>
 
-			{
-				userContext.hasPermission(PermissionType.EXPERIMENTAL) ?
-					<div
-						className={`secondary-option ${spotifySearchSelected} hoverable`}
-						onClick={() => {
-							props.setCenterView(CenterView.SPOTIFY_SEARCH);
-						}}
-					>
-						<span>Spotify</span>
-					</div> : null
-			}
+			<div
+				className={`secondary-option ${spotifySearchSelected} hoverable`}
+				onClick={() => {
+					props.setCenterView(CenterView.SPOTIFY_SEARCH);
+				}}
+			>
+				<span>Spotify</span>
+			</div>
 
 			<div
 				className={`secondary-option ${globalSearchSelected} hoverable`}
