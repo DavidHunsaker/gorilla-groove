@@ -14,6 +14,7 @@ import {toast} from "react-toastify";
 import {MusicContext} from "../../services/music-provider";
 import CrashReport from "../crash-report/crash-report";
 import {clearMediaSession} from "../../media-key";
+import * as LocalStorage from '../../local-storage'
 
 const originalTitle = document.title;
 
@@ -47,6 +48,11 @@ export default function UserButton() {
 		})
 	};
 
+	const handleTurnOnBetaClient = () => {
+		LocalStorage.setBoolean('beta-client', true);
+		window.location.reload();
+	}
+
 	return (
 		<div className="user-menu">
 			<PopoutMenu
@@ -62,6 +68,7 @@ export default function UserButton() {
 					{ component: <DraftRelease/>, shouldRender: userContext.hasPermission(PermissionType.WRITE_VERSION_HISTORY) },
 					{ component: <CrashReport/>, shouldRender: userContext.hasPermission(PermissionType.VIEW_CRASH_REPORTS) },
 					{ text: "Run Review Queues", clickHandler: runReviewQueues, shouldRender: userContext.hasPermission(PermissionType.RUN_REVIEW_QUEUES) },
+					{ text: "Use Beta Client", clickHandler: handleTurnOnBetaClient, shouldRender: userContext.hasPermission(PermissionType.EXPERIMENTAL) },
 					{ text: "Logout", clickHandler: logout }
 				]}
 			/>

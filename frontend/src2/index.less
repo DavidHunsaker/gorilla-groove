@@ -1,0 +1,180 @@
+@dark-blue: #005A8A;
+@blue: #1D87BA;
+@light-blue: #60B7ED;
+
+@dark-cyan: #5DC6B0;
+@cyan: #91F9E2;
+@light-cyan: #C5FFFF;
+
+@grey1: #333;
+@grey2: #4F4F4F;
+@grey3: #828282;
+@grey4: #BDBDBD;
+@grey5: #E0E0E0;
+@grey6: #F2F2F2;
+
+@text-white: rgba(255, 255, 255, 0.87);
+@text-black: rgba(0, 0, 0, .87);
+
+@import 'components/Login/login';
+@import 'components/MainPage/main';
+
+.blue-background() {
+  background-color: @dark-blue;
+  color: white;
+}
+
+.grey-background() {
+  background-color: @grey1;
+  color: @text-white;
+}
+
+.panel-shadow() {
+  box-shadow: 0 0 5px 0 #000;
+}
+
+@keyframes spin {
+  from {
+    transform:rotate(0deg);
+  }
+  to {
+    transform:rotate(360deg);
+  }
+}
+
+.animation-spin() {
+  animation-name: spin;
+  animation-duration: 1500ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+body.beta {  // TODO: remove this namespacing
+  .blue-background();
+
+  .beta-warning {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background-color: #fff;
+    color: #000;
+    padding: 8px;
+    .panel-shadow();
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: .75em;
+
+    p {
+      margin: 0;
+    }
+  }
+
+  #root {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+
+    // TODO: remove when beta banner gone, but keep height: 100%
+    & > div:not(.beta-warning) {
+      height: calc(100% - 40px);
+      width: 100%;
+      padding: 0;
+    }
+  }
+
+  .logo {
+    img {
+      height: 52px;
+    }
+
+    div {
+      display: inline-block;
+      h1 {
+        font-size: 1.25em;
+        margin: 0;
+        border-bottom: 2px solid @cyan;
+        padding-bottom: 4px;
+        display: inline-block;
+      }
+
+      h2 {
+        font-size: 1em;
+        font-style: italic;
+        font-weight: normal;
+        margin: 4px 0;
+        line-height: 1.25em;
+      }
+    }
+  }
+
+  form {
+    .form-group {
+      display: flex;
+      align-self: stretch;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .form-buttons {
+      padding-top: 12px;
+    }
+  }
+
+  button {
+    border: none;
+    border-radius: 2px;
+    padding: 10px 16px;
+    background-color: @grey4;
+    color: @text-black;
+
+    &:hover {
+      background-color: lighten(@grey4, 5%);
+    }
+
+    &:focus-visible {
+      outline: 1px solid @text-white;
+    }
+
+    &.small {
+      padding: 4px 12px;
+      min-width: 50px;
+    }
+
+    &.primary {
+      background-color: @blue;
+      color: white;
+      font-weight: bold;
+
+      &:hover {
+        background-color: lighten(@blue, 5%);
+      }
+    }
+
+    &.link {
+      background-color: transparent;
+      color: white;
+      padding: 2px;
+      cursor: pointer;
+
+      &:hover, &:focus-visible {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  input {
+    border: none;
+    padding: 2px 8px;
+    border-radius: 2px;
+    line-height: 20px;
+
+    &:focus-visible {
+      outline: 3px solid @blue;
+    }
+  }
+}
+
