@@ -12,11 +12,11 @@ data class UserToken(
 		@GeneratedValue(strategy = GenerationType.IDENTITY)
 		val id: Long = 0,
 
-		@ManyToOne
+		@ManyToOne(fetch = FetchType.LAZY)
 		@JoinColumn(name = "user_id")
 		val user: User,
 
-		@ManyToOne
+		@ManyToOne(fetch = FetchType.LAZY)
 		@JoinColumn(name = "device_id")
 		var device: Device?, // Should be non-null and be a VAL when we are done migrating users to the device-on-token system
 

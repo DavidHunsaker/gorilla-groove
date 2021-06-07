@@ -14,11 +14,11 @@ class PlaylistTrack(
 		override val id: Long = 0,
 
 		@JsonIgnore
-		@ManyToOne
+		@ManyToOne(fetch = FetchType.LAZY, optional = false)
 		@JoinColumn(name = "playlist_id")
 		val playlist: Playlist,
 
-		@ManyToOne
+		@ManyToOne(fetch = FetchType.LAZY, optional = false)
 		@JoinColumn(name = "track_id")
 		val track: Track,
 

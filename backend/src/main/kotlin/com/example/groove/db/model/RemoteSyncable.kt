@@ -12,7 +12,7 @@ interface RemoteSyncable : SyncDTO, GGEntity {
 
 	var deleted: Boolean
 
-	// This is actually what gets returned to the mobile apps, with any cruft trimmed out
+	// This is what actually gets returned to the mobile apps, with any cruft trimmed out
 	fun toSyncDTO(): SyncDTO { return this }
 }
 

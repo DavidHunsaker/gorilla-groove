@@ -15,12 +15,12 @@ class BackgroundTaskItem(
 		val id: Long = 0,
 
 		@JsonIgnore
-		@ManyToOne
+		@ManyToOne(fetch = FetchType.LAZY)
 		@JoinColumn(name = "user_id")
 		val user: User,
 
 		@JsonIgnore
-		@ManyToOne
+		@ManyToOne(fetch = FetchType.LAZY)
 		@JoinColumn(name = "device_id")
 		val originatingDevice: Device,
 

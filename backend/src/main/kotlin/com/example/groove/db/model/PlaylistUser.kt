@@ -15,12 +15,12 @@ data class PlaylistUser(
 		val id: Long = 0,
 
 		@JsonIgnore
-		@ManyToOne
+		@ManyToOne(fetch = FetchType.LAZY)
 		@JoinColumn(name = "playlist_id", nullable = false)
 		val playlist: Playlist,
 
 		@JsonIgnore
-		@ManyToOne
+		@ManyToOne(fetch = FetchType.LAZY)
 		@JoinColumn(name = "user_id", nullable = false)
 		val user: User,
 

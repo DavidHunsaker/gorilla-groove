@@ -15,14 +15,14 @@ class Device(
 		val id: Long = 0,
 
 		@JsonIgnore
-		@ManyToOne
+		@ManyToOne(fetch = FetchType.LAZY)
 		@JoinColumn(name = "user_id")
 		val user: User,
 
 		// Multiple devices can be merged together to act as one device
 		// Should only ever go 1 level deep as references are updated if multiple merges happen
 		@JsonIgnore
-		@ManyToOne
+		@ManyToOne(fetch = FetchType.LAZY)
 		@JoinColumn(name = "merged_device_id")
 		var mergedDevice: Device? = null,
 

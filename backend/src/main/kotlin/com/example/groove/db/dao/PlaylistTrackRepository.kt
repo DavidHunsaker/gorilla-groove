@@ -57,9 +57,14 @@ interface PlaylistTrackRepository : JpaRepository<PlaylistTrack, Long>, RemoteSy
 		pageable: Pageable
 	): Page<PlaylistTrack>
 
+	// Idk why "fetch = FetchType.LAZY" does not work here. I have the @ManyToOne playlist and track set to lazy in PlaylistTrack, and immediately
+	// upon returning from the query, Hibernate does a select for each of the Playlists and Tracks for seemingly no reason.
+	// To get around this I just do a JOIN FETCH instead. I don't need this data, but at least it keeps Hibernate from doing a metric assload of queries....
 	@Query("""
 			SELECT pt
 			FROM PlaylistTrack pt
+			JOIN FETCH pt.playlist
+			JOIN FETCH pt.track
 			WHERE pt.deleted = FALSE
 			AND pt.playlist.id IN (
 			  SELECT pu.playlist.id
