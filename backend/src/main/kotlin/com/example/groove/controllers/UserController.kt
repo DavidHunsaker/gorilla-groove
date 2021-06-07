@@ -5,7 +5,6 @@ import com.example.groove.db.model.UserPermission
 import com.example.groove.services.SyncableEntityService
 import com.example.groove.services.UserService
 import com.example.groove.util.loadLoggedInUser
-import com.fasterxml.jackson.annotation.JsonIgnore
 
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -17,7 +16,7 @@ import javax.validation.constraints.Size
 @RestController
 @RequestMapping("api/user")
 class UserController(
-		private val userService: UserService
+	private val userService: UserService
 ) {
 
 	// NOTE: This is available anonymously, as users now create their own accounts (with a valid invite link)
@@ -27,16 +26,16 @@ class UserController(
 		userService.saveUser(user, userCreateDTO.inviteLinkIdentifier)
 
 		return ResponseEntity
-				.ok()
-				.build()
+			.ok()
+			.build()
 	}
 
 	@GetMapping
 	fun getUsers(
-			@RequestParam(value = "showAll") showAll: Boolean?
+		@RequestParam(value = "showAll") showAll: Boolean?
 	): List<UserResponseDTO> {
 		return userService.getUsers(showAll ?: false).map {
-			UserResponseDTO(it.id, it.name, it.email)
+			UserResponseDTO(it.id, it.name, it.email, it.lastLogin)
 		}
 	}
 
@@ -46,11 +45,11 @@ class UserController(
 		val loggedInUser = loadLoggedInUser()
 		return SyncableEntityService.SyncableUser(
 			id = loggedInUser.id,
-            name = loggedInUser.name,
+			name = loggedInUser.name,
 			lastLogin = loggedInUser.lastLogin,
 			createdAt = loggedInUser.createdAt,
 			updatedAt = loggedInUser.updatedAt,
-            deleted = loggedInUser.deleted
+			deleted = loggedInUser.deleted
 		)
 	}
 
@@ -60,21 +59,22 @@ class UserController(
 	}
 
 	data class UserCreateDTO(
-			@field:Size(max = 32, message = "Username can be no longer than 32 characters")
-			val username: String,
+		@field:Size(max = 32, message = "Username can be no longer than 32 characters")
+		val username: String,
 
-			@field:Email
-			val email: String,
+		@field:Email
+		val email: String,
 
-			@field:Size(min = 9, max = 255, message = "Password must be between 9 and 255 characters long")
-			val password: String,
+		@field:Size(min = 9, max = 255, message = "Password must be between 9 and 255 characters long")
+		val password: String,
 
-			val inviteLinkIdentifier: String
+		val inviteLinkIdentifier: String
 	)
 
 	data class UserResponseDTO(
-			val id: Long,
-			val username: String,
-			val email: String
+		val id: Long,
+		val username: String,
+		val email: String,
+		val lastLogin: Timestamp
 	)
 }
