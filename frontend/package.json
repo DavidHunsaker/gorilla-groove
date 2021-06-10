@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "test",
+    "start": "webpack --mode development --watch",
+    "build": "webpack"
   },
   "author": "",
   "license": "ISC",
