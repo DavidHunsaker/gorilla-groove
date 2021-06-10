@@ -131,7 +131,7 @@ class FileMetadataService {
 		// MP3s will flip out if you try to set an empty string for the track number. OGGs don't care
 		track.trackNumber?.toString()?.let { tag.setField(FieldKey.TRACK, it) }
 		tag.setField(FieldKey.YEAR, track.releaseYear?.toString() ?: "")
-		tag.setField(FieldKey.GENRE, track.genre ?: "")
+		tag.setField(FieldKey.GENRE, track.genre)
 
 		albumArt?.let {
 			// This doesn't seem to actually work... Not sure if it's because it's .ogg. But oh well

@@ -45,7 +45,7 @@ data class Track(
 		var releaseYear: Int? = null,
 
 		@Column
-		var genre: String? = null,
+		var genre: String = "",
 
 		@Column(name = "play_count")
 		var playCount: Int = 0,
@@ -81,7 +81,7 @@ data class Track(
 		var offlineAvailability: OfflineAvailabilityType = OfflineAvailabilityType.NORMAL,
 
 		@Column
-		var note: String? = null,
+		var note: String = "",
 
 		@JsonIgnore
 		@ManyToOne(fetch = FetchType.LAZY)
