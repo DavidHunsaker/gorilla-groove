@@ -103,7 +103,8 @@ class YoutubeDownloadService(
 	}
 
 	// These are bits of pointless noise in some of the channels I use this on.
-	// I'd like to make this be something users can customize on the fly to suit their channels
+	// I'd like to make this be something users can customize on the fly to suit their channels.
+	// I'd also like to make this slightly less naive with like, detecting either ( or [ probably with a regex. But I'll deal with that later probably maybe (probably not)
 	fun stripYouTubeSpecificTerms(inputStr: String): String {
 		val thingsToStrip = setOf(
 			"(lyrics)",
@@ -114,6 +115,7 @@ class YoutubeDownloadService(
 			"(Official Video)",
 			"(Official Music Video)",
 			"(Official Lyric Video)",
+			"[Official Lyric Video]",
 			"(Official Audio)",
 			"(Original Mix)",
 			"(Original Music)",
@@ -274,7 +276,8 @@ class YoutubeDownloadService(
 		val logger = logger()
 
 		// When we are checking if a YouTube video is valid for a given Spotify song, we want to make sure
-		// that the song lengths more or less agree. This is the tolerance for that check
+		// that the song lengths more or less agree. This is the tolerance for that check.
+		// e.g. Spotify says a song is 174 seconds long. We want to exclude a YT video that is 165 seconds long or 180 seconds long, or whatever. But allow a 173 second long one
 		const val SONG_LENGTH_IDENTIFICATION_TOLERANCE = 4
 	}
 }

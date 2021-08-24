@@ -21,20 +21,21 @@ import com.example.groove.util.minusWeeks
 import org.springframework.core.env.Environment
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class ReviewSourceArtistService(
-		private val spotifyApiClient: SpotifyApiClient,
-		private val reviewSourceArtistRepository: ReviewSourceArtistRepository,
-		private val reviewSourceArtistDownloadRepository: ReviewSourceArtistDownloadRepository,
-		private val reviewSourceUserRepository: ReviewSourceUserRepository,
-		private val youtubeDownloadService: YoutubeDownloadService,
-		private val trackService: TrackService,
-		private val trackRepository: TrackRepository,
-		private val reviewQueueSocketHandler: ReviewQueueSocketHandler,
-		private val environment: Environment,
-		private val s3Properties: S3Properties
+	private val spotifyApiClient: SpotifyApiClient,
+	private val reviewSourceArtistRepository: ReviewSourceArtistRepository,
+	private val reviewSourceArtistDownloadRepository: ReviewSourceArtistDownloadRepository,
+	private val reviewSourceUserRepository: ReviewSourceUserRepository,
+	private val youtubeDownloadService: YoutubeDownloadService,
+	private val trackService: TrackService,
+	private val trackRepository: TrackRepository,
+	private val reviewQueueSocketHandler: ReviewQueueSocketHandler,
+	private val environment: Environment,
+	private val s3Properties: S3Properties
 ) {
 	@Scheduled(cron = "0 0 9 * * *") // 9 AM every day (UTC)
 	@Transactional
@@ -50,7 +51,13 @@ class ReviewSourceArtistService(
 
 		logger.info("Running Review Source Artist Downloader")
 
-		allSources.forEach { processSource(it) }
+		allSources.forEach { source ->
+			try {
+				processSource(source)
+			} catch (e: Throwable) {
+				logger.error("Failed to process artist review source ${source.artistName} (${source.id})!", e)
+			}
+		}
 
 		logger.info("Review Source Artist Downloader complete")
 	}
@@ -59,7 +66,7 @@ class ReviewSourceArtistService(
 	// "could not initialize proxy - no Session". However, I don't want one transaction because
 	// then if we have an issue everything gets rolled back. Function is public only to allow
 	// @Transactional annotation to work because it is a limitation of Spring Boot
-	@Transactional
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	fun processSource(source: ReviewSourceArtist) {
 		if (!source.isActive()) {
 			return
@@ -101,8 +108,8 @@ class ReviewSourceArtistService(
 
 			// Otherwise, this is a song we've never seen before. Add a record of it
 			ReviewSourceArtistDownload(
-					reviewSource = source,
-					trackName = newSong.name
+				reviewSource = source,
+				trackName = newSong.name
 			).also { reviewSourceArtistDownloadRepository.save(it) }
 
 			return@filter true
@@ -125,11 +132,11 @@ class ReviewSourceArtistService(
 
 		songsToDownload.forEach { song ->
 			val artistDownload = reviewSourceArtistDownloadRepository.findByReviewSourceAndTrackName(source, song.name)
-					?: throw IllegalStateException("Could not locate an artist download with review source ID: ${source.id} and song name ${song.name}!")
+				?: throw IllegalStateException("Could not locate an artist download with review source ID: ${source.id} and song name ${song.name}!")
 			val video = youtubeDownloadService.searchYouTube(
-					artist = song.artist,
-					trackName = song.name,
-					targetLength = song.length
+				artist = song.artist,
+				trackName = song.name,
+				targetLength = song.length
 			).firstOrNull()
 
 			if (video == null) {
@@ -143,16 +150,16 @@ class ReviewSourceArtistService(
 
 			logger.info("Found a valid match. YouTube video title: ${video.title}")
 			val downloadDTO = YoutubeDownloadDTO(
-					url = video.videoUrl,
-					name = song.name,
-					artist = song.artist,
-					album = song.album,
-					releaseYear = song.releaseYear,
+				url = video.videoUrl,
+				name = song.name,
+				artist = song.artist,
+				album = song.album,
+				releaseYear = song.releaseYear,
 
-					// Because we started from Spotify, we have a URL to the actual album art.
-					// This is better than whatever it is we will get from the YT download, so pass it along to be used instead
-					artUrl = song.albumArtLink,
-					cropArtToSquare = true
+				// Because we started from Spotify, we have a URL to the actual album art.
+				// This is better than whatever it is we will get from the YT download, so pass it along to be used instead
+				artUrl = song.albumArtLink,
+				cropArtToSquare = true
 			)
 
 			// Sometimes YoutubeDL can have issues. Don't cascade fail all downloads because of it
@@ -201,7 +208,7 @@ class ReviewSourceArtistService(
 		// fix any typos or things of that nature
 		val targetName = artistName.toLowerCase()
 		val foundArtist = artists.find { it.name.toLowerCase() == targetName }
-				?: return null to artists.map { it.name }.take(5)
+			?: return null to artists.map { it.name }.take(5)
 
 		// Cool cool cool we found an artist in spotify. Now just save it.
 		// Hard-code "searchNewerThan" to now() until we are not throttled by YouTube and can search unlimited

@@ -46,7 +46,13 @@ class ReviewSourceYoutubeChannelService(
 
 		logger.info("Running Review Source Youtube Channel Downloader")
 
-		allSources.forEach { processSource(it) }
+		allSources.forEach { source ->
+			try {
+				processSource(source)
+			} catch (e: Throwable) {
+				logger.error("Failed to process YouTube review source ${source.channelName} (${source.id})!", e)
+			}
+		}
 
 		logger.info("Review Source Youtube Channel Downloader complete")
 	}
@@ -84,6 +90,11 @@ class ReviewSourceYoutubeChannelService(
 			// Some channels will put out mixes every now and then. I don't really want to download mixes automatically as they could be huge, and don't really fit the GG spirit of adding individual songs
 			if (video.duration > MAX_VIDEO_LENGTH) {
 				logger.info("Video ${video.title} from ${video.channelTitle} has a duration of ${video.duration} which exceeds our max allowed duration of $MAX_VIDEO_LENGTH. It will be skipped")
+				return@saveLoop
+			}
+			// Channels will also sometimes put out announcement videos that are just annoying and get in the way of reviewing stuff. Don't download really short stuff that's unlikely to be actual music
+			if (video.duration < MIN_VIDEO_LENGTH) {
+				logger.info("Video ${video.title} from ${video.channelTitle} has a duration of ${video.duration} which is less than our min allowed duration of $MIN_VIDEO_LENGTH. It will be skipped")
 				return@saveLoop
 			}
 
@@ -233,7 +244,7 @@ class ReviewSourceYoutubeChannelService(
 		logger.info("Subscribing ${user.name} to channel by title $channelTitle...")
 
 		val channelSnippets = youtubeApiClient.findChannels(channelTitle).find {
-			it.channelTitle.toLowerCase() == channelTitle.toLowerCase()
+			it.channelTitle.equals(channelTitle, ignoreCase = true)
 		} ?: throw IllegalArgumentException("No channel found with title $channelTitle")
 
 		return subscribeToChannelId(channelSnippets.channelId)
@@ -243,5 +254,6 @@ class ReviewSourceYoutubeChannelService(
 		private val logger = logger()
 
 		const val MAX_VIDEO_LENGTH = 15 * 60 // 15 minutes
+		const val MIN_VIDEO_LENGTH = 90 // 1 minute
 	}
 }
