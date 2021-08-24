@@ -66,6 +66,7 @@ class ReviewSourceArtistService(
 	// "could not initialize proxy - no Session". However, I don't want one transaction because
 	// then if we have an issue everything gets rolled back. Function is public only to allow
 	// @Transactional annotation to work because it is a limitation of Spring Boot
+    // FIXME doesn't actually seem to work because Spring doesn't allow self-invocation... https://stackoverflow.com/a/37217866
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	fun processSource(source: ReviewSourceArtist) {
 		if (!source.isActive()) {
@@ -91,7 +92,7 @@ class ReviewSourceArtistService(
 		val existingSongDiscoveries = reviewSourceArtistDownloadRepository.findByReviewSource(source)
 		val discoveredSongNameToDownloadAttempt = existingSongDiscoveries.map {
 			it.trackName.toLowerCase() to it
-		}.toMap()
+		}.toMap().toMutableMap()
 
 		val oneWeekAgo = now().minusWeeks(1)
 		val songsToDownload = newSongs.filter { newSong ->
@@ -107,10 +108,14 @@ class ReviewSourceArtistService(
 			}
 
 			// Otherwise, this is a song we've never seen before. Add a record of it
-			ReviewSourceArtistDownload(
+			val newDownload = ReviewSourceArtistDownload(
 				reviewSource = source,
 				trackName = newSong.name
 			).also { reviewSourceArtistDownloadRepository.save(it) }
+
+			// Sometimes there can be stupid data and we get the same thing returned to us, maybe on a different album but the same song.
+			// Make sure we keep updating our map so that getting two of these in a row doesn't cause issues.
+			discoveredSongNameToDownloadAttempt[newSong.name.toLowerCase()] = newDownload
 
 			return@filter true
 		}
