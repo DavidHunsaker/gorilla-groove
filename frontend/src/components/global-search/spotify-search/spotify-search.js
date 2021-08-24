@@ -136,7 +136,7 @@ export default function SpotifySearch() {
 			downloadFromYoutube(spotifyIdToYoutubeUrl[spotifyTrack.sourceId], spotifyTrack)
 		} else {
 			const term = encodeURIComponent(spotifyTrack.artist + ' ' + spotifyTrack.name);
-			Api.get(`search/youtube/term/${term}/length/${spotifyTrack.length}`).then(res => {
+			Api.get(`search/youtube/artist/${spotifyTrack.artist}/track-name/${spotifyTrack.name}/length/${spotifyTrack.length}`).then(res => {
 				if (!res || !res.videoUrl) {
 					toast.error(`Failed to find a video to download for ${spotifyTrack.name}`);
 					setSourceLoading(spotifyTrack.sourceId, false);

@@ -31,6 +31,8 @@ class SearchController(
 			@PathVariable trackName: String,
 			@PathVariable length: Int
 	): YoutubeDownloadService.VideoProperties? {
+		logger.info("User ${loadLoggedInUser().name} is searching for videos by artist '$artist' with name '$trackName' and length '$length'")
+
 		val properties = youtubeDownloadService.searchYouTube(
 				artist = artist,
 				trackName = trackName,
