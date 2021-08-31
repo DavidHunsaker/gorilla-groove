@@ -7,8 +7,6 @@ import com.gorilla.gorillagroove.service.GGLog.logDebug
 import com.gorilla.gorillagroove.service.GGLog.logError
 import java.time.Instant
 
-typealias SyncHandler = ((SyncType, Double) -> Unit)
-
 abstract class StandardSynchronizer<DbType : DbEntity, ResponseType: EntityResponse>(
     // We don't want this to hold a reference to the DAO, because otherwise this can break when logging out / back in as it holds a stale ref.
     // So that is why this takes a function that returns a DAO instead, so it always get a good reference.
@@ -18,7 +16,7 @@ abstract class StandardSynchronizer<DbType : DbEntity, ResponseType: EntityRespo
     suspend fun sync(
         syncStatus: DbSyncStatus,
         maximum: Instant,
-        onPageSyncedHandler: SyncHandler? = null,
+        onPageSyncedHandler: suspend ((SyncType, Double) -> Unit),
     ): Boolean {
         var currentPage = 0
         var pagesToGet: Int
@@ -34,7 +32,7 @@ abstract class StandardSynchronizer<DbType : DbEntity, ResponseType: EntityRespo
 
             val percentComplete = currentPage.toDouble() / pagesToGet
 
-            onPageSyncedHandler?.invoke(syncStatus.syncType, percentComplete)
+            onPageSyncedHandler.invoke(syncStatus.syncType, percentComplete)
         } while (currentPage < pagesToGet)
 
         return true

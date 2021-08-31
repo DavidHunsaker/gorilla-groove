@@ -24,7 +24,7 @@ object ServerSynchronizer {
     suspend fun syncWithServer(
         syncTypes: Set<SyncType> = SyncType.values().toSet(),
         abortIfRecentlySynced: Boolean = false,
-        onPageSyncedHandler: SyncHandler? = null,
+        onPageSyncedHandler: suspend ((SyncType, Double) -> Unit) = { _, _ -> },
     ) = withContext(Dispatchers.IO) {
         if (GGSettings.offlineModeEnabled) {
             return@withContext

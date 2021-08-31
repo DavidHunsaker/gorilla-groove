@@ -49,45 +49,47 @@ class FirstTimeSyncFragment : Fragment(R.layout.fragment_first_time_sync) {
         val extrasToSync = syncTypesRemaining.size - 2 // 2 because tracks and playlists have their own
 
         // Sync all the things we need to sync. Every time something syncs a page, we invoke this callback to update the UI. When all are synced, we automatically navigate away.
-        ServerSynchronizer.syncWithServer(abortIfRecentlySynced = false) { syncType, syncedPercent ->
+        suspend fun pageSyncHandler(syncType: SyncType, syncedPercent: Double) {
             val percentInt = (syncedPercent * 100).roundToInt()
 
-            when (syncType) {
-                SyncType.TRACK -> {
-                    libraryPercentage.text = "$percentInt%"
-                    libraryProgressBar.progress = percentInt
+            withContext(Dispatchers.Main) {
+                when (syncType) {
+                    SyncType.TRACK -> {
+                        libraryPercentage.text = "$percentInt%"
+                        libraryProgressBar.progress = percentInt
 
-                    if (percentInt == 100) {
-                        libraryPercentage.setTextColor(context.getColor(R.color.ggPrimary))
+                        if (percentInt == 100) {
+                            libraryPercentage.setTextColor(context.getColor(R.color.ggPrimary))
+                        }
+                    }
+                    SyncType.PLAYLIST_TRACK -> {
+                        playlistsPercentage.text = "$percentInt%"
+                        playlistsProgressBar.progress = percentInt
+
+                        if (percentInt == 100) {
+                            playlistsPercentage.setTextColor(context.getColor(R.color.ggPrimary))
+                        }
+                    }
+                    else -> {
+                        if (percentInt == 100) {
+                            extrasSynced++
+                        }
+
+                        val extrasSyncedPercent = ((extrasSynced.toDouble() / extrasToSync) * 100).roundToInt()
+
+                        extrasPercentage.text = "$extrasSyncedPercent%"
+                        extrasProgressBar.progress = extrasSyncedPercent
+
+                        if (extrasSyncedPercent == 100) {
+                            extrasPercentage.setTextColor(context.getColor(R.color.ggPrimary))
+                        }
                     }
                 }
-                SyncType.PLAYLIST_TRACK -> {
-                    playlistsPercentage.text = "$percentInt%"
-                    playlistsProgressBar.progress = percentInt
 
-                    if (percentInt == 100) {
-                        playlistsPercentage.setTextColor(context.getColor(R.color.ggPrimary))
-                    }
+                // If our percent is 100, then we have finished syncing this type and can remove it from the set
+                if (percentInt == 100) {
+                    syncTypesRemaining.remove(syncType)
                 }
-                else -> {
-                    if (percentInt == 100) {
-                        extrasSynced++
-                    }
-
-                    val extrasSyncedPercent = ((extrasSynced.toDouble() / extrasToSync) * 100).roundToInt()
-
-                    extrasPercentage.text = "$extrasSyncedPercent%"
-                    extrasProgressBar.progress = extrasSyncedPercent
-
-                    if (extrasSyncedPercent == 100) {
-                        extrasPercentage.setTextColor(context.getColor(R.color.ggPrimary))
-                    }
-                }
-            }
-
-            // If our percent is 100, then we have finished syncing this type and can remove it from the set
-            if (percentInt == 100) {
-                syncTypesRemaining.remove(syncType)
             }
 
             // If all things are removed, then we're done and we can proceed into the main part of the app
@@ -105,5 +107,7 @@ class FirstTimeSyncFragment : Fragment(R.layout.fragment_first_time_sync) {
                 }
             }
         }
+
+        ServerSynchronizer.syncWithServer(abortIfRecentlySynced = false, onPageSyncedHandler = ::pageSyncHandler)
     }
 }
