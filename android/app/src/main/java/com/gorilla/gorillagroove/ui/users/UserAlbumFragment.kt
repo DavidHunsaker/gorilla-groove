@@ -1,6 +1,7 @@
 package com.gorilla.gorillagroove.ui.users
 
 import android.os.Bundle
+import android.view.View
 import com.gorilla.gorillagroove.database.dao.Album
 import com.gorilla.gorillagroove.database.entity.DbUser
 import com.gorilla.gorillagroove.di.Network
@@ -14,9 +15,13 @@ class UserAlbumFragment : AlbumFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         user = requireArguments().getSerializable("USER") as DbUser
 
-        requireActivity().title_tv.text = "${user!!.name}'s Library"
-
         super.onCreate(savedInstanceState)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        requireActivity().title_tv.text = "${user!!.name}'s Library"
     }
 
     override suspend fun getAlbums(): List<Album> {

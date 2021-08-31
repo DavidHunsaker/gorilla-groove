@@ -39,12 +39,12 @@ class PlaylistTrackFragment : TrackListFragment<PlaylistTrackWithTrack>() {
 
         playlist = arguments?.getSerializable("PLAYLIST") as? DbPlaylist
             ?: throw IllegalArgumentException("A DbPlaylist with key 'PLAYLIST' must be provided to the PlaylistFragment!")
-
-        requireActivity().title_tv.text = playlist.name
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        requireActivity().title_tv.text = playlist.name
 
         logInfo("Loading PlaylistTracks view with playlist ID: ${playlist.id}")
     }
