@@ -3,8 +3,8 @@
 export class Api {
 
 	static getBaseUrl() {
-		const protocol = isLocalEnvironment() ? 'http' : 'https';
-		return protocol + "://" + window.location.host;
+		const protocol = isLocalEnvironment() ? 'http' : 'https'
+		return protocol + '://' + window.location.host
 	}
 
 	static getBaseApiUrl() {
@@ -12,41 +12,41 @@ export class Api {
 	}
 
 	static getSocketUri() {
-		const protocol = isLocalEnvironment() ? 'ws' : 'wss';
+		const protocol = isLocalEnvironment() ? 'ws' : 'wss'
 		return protocol + '://' + window.location.host + '/api/socket'
 	}
 
 	static get(url, params) {
-		let urlParameters = Api.encodeUriParamsFromObject(params);
+		let urlParameters = Api.encodeUriParamsFromObject(params)
 
-		return this.sendRequest('get', url + urlParameters);
+		return this.sendRequest('get', url + urlParameters)
 	}
 
 	static put(url, params) {
-		return Api.sendRequest('put', url, params);
+		return Api.sendRequest('put', url, params)
 	}
 
 	static post(url, params) {
-		return Api.sendRequest('post', url, params);
+		return Api.sendRequest('post', url, params)
 	}
 
 	static delete(url, params) {
-		let urlParameters = Api.encodeUriParamsFromObject(params);
+		let urlParameters = Api.encodeUriParamsFromObject(params)
 
-		return this.sendRequest('delete', url + urlParameters);
+		return this.sendRequest('delete', url + urlParameters)
 	}
 
 	static sendRequest(requestType, url, params) {
-		const headers = { 'Content-Type': 'application/json' };
+		const headers = {'Content-Type': 'application/json'}
 
 		const requestParams = {
 			method: requestType,
 			headers: new Headers(headers),
-			credentials: 'include',
-		};
+			credentials: 'include'
+		}
 
 		if (requestType !== 'get') {
-			requestParams.body = JSON.stringify(params);
+			requestParams.body = JSON.stringify(params)
 		}
 
 		return fetch(this.getBaseApiUrl() + url, requestParams).then(res => {
@@ -55,18 +55,19 @@ export class Api {
 			if (!res.ok) {
 				return res.text().then(text => {
 					if (!text) {
-						throw { error: res.statusText, status: res.status}
+						throw {error: res.statusText, status: res.status}
 					}
 
-					let json;
+					let json
 					try {
-						json = JSON.parse(text);
-					} catch (e) {
-						throw { error: text, status: res.status };
+						json = JSON.parse(text)
+					}
+					catch (e) {
+						throw {error: text, status: res.status}
 					}
 
-					throw json;
-				});
+					throw json
+				})
 			}
 
 			// There isn't always a response body for POSTs, and calling res.json() will create a parse error
@@ -75,57 +76,58 @@ export class Api {
 			return res.text().then(text => {
 				return text ? JSON.parse(text) : {}
 			})
-		});
+		})
 	};
 
 	static download(url, params) {
-		let urlParameters = Api.encodeUriParamsFromObject(params);
+		let urlParameters = Api.encodeUriParamsFromObject(params)
 
-		const fullUrl = this.getBaseApiUrl() + url + urlParameters;
+		const fullUrl = this.getBaseApiUrl() + url + urlParameters
 
-		const a = document.createElement("a");
-		a.href = fullUrl;
-		a.setAttribute("download", "true");
-		a.click();
+		const a = document.createElement('a')
+		a.href = fullUrl
+		a.setAttribute('download', 'true')
+		a.click()
 	}
 
 	static upload(httpMethod, url, params, progressCallback) {
-		const fullUrl = this.getBaseApiUrl() + url;
+		const fullUrl = this.getBaseApiUrl() + url
 
 		return new Promise((resolve, reject) => {
-			let formData = new FormData();
+			let formData = new FormData()
 
 			Object.keys(params).forEach(paramKey => {
-				formData.append(paramKey, params[paramKey]);
-			});
+				formData.append(paramKey, params[paramKey])
+			})
 
-			let xhr = new XMLHttpRequest();
-			xhr.open(httpMethod, fullUrl);
-			xhr.withCredentials = true;
-			xhr.upload.addEventListener("progress", progressCallback, false);
+			let xhr = new XMLHttpRequest()
+			xhr.open(httpMethod, fullUrl)
+			xhr.withCredentials = true
+			xhr.upload.addEventListener('progress', progressCallback, false)
 			xhr.onload = function () {
 				if (this.status >= 200 && this.status < 300) {
-					resolve(xhr.response);
-				} else {
+					resolve(xhr.response)
+				}
+				else {
 					reject({
 						status: this.status,
 						statusText: xhr.statusText
-					});
+					})
 				}
-			};
+			}
 			xhr.onerror = function () {
 				reject({
 					status: this.status,
 					statusText: xhr.statusText
-				});
-			};
-			xhr.send(formData);
-		});
+				})
+			}
+			xhr.send(formData)
+		})
 	}
 
 	static encodeUriParamsFromObject(params) {
 		if (!params || Object.keys(params).length === 0) {
-			return '';
+			return ''
 		}
 
 		let queryString = Object.keys(params).map(key => {
@@ -136,24 +138,26 @@ export class Api {
 				return params[key].map(sortItem => {
 					return `sort=${sortItem}`
 				}).join('&')
-			} else {
-				let encodedKey = encodeURIComponent(key);
-				let value = params[key];
-				let encodedValue = '';
+			}
+			else {
+				let encodedKey = encodeURIComponent(key)
+				let value = params[key]
+				let encodedValue
 				if (Array.isArray(value)) {
 					encodedValue = value.map(it => encodeURIComponent(it)).join(',')
-				} else {
-					encodedValue = encodeURIComponent(params[key]);
+				}
+				else {
+					encodedValue = encodeURIComponent(params[key])
 				}
 				return `${encodedKey}=${encodedValue}`
 			}
-		}).join('&');
+		}).join('&')
 
-		return '?' + queryString;
+		return '?' + queryString
 	}
 }
 
 function isLocalEnvironment() {
 	// We only use a port in the UI when doing local dev
-	return window.location.host.includes(":");
+	return window.location.host.includes(':')
 }

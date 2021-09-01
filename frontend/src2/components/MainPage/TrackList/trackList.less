@@ -1,0 +1,107 @@
+body.beta { // TODO: remove this namespacing
+  .search-tools {
+    padding: 20px;
+
+    .input-group {
+      position: relative;
+      margin-bottom: 12px;
+
+      & svg {
+        position: absolute;
+        top: 6px;
+        left: 8px;
+        color: @grey2;
+
+        &:hover {
+          cursor: text;
+        }
+      }
+
+      & input {
+        padding-left: 32px;
+        height: 28px;
+        width: 280px;
+      }
+    }
+    .filter-group {
+      & button, & span, & label {
+        font-size: 13px;
+      }
+
+      & span {
+        margin-right: 10px;
+      }
+
+      & button {
+        padding: 0 8px;
+        color: #60B7ED;  // TODO: replace with @light-blue when old variables are gone
+        &.current {
+          color: white;
+          text-decoration: none;
+          &:hover {
+            cursor: default;
+          }
+        }
+      }
+
+      & input[type=checkbox] {
+        margin-left: 20px;
+        margin-right: 8px;
+      }
+
+      & .help {
+        margin-left: 8px;
+      }
+    }
+  }
+
+  .list {
+    overflow: auto;
+    height: calc(100% - 100px); // minus the height of the filter header (16 + 16 + 18)
+
+    table {
+      font-variant: tabular-nums;
+      border-collapse: collapse;
+      min-width: calc(100% - 40px); // if the table is smaller than the window, always fit with margins
+      margin-left: auto; // and center it
+      margin-right: auto;
+
+      thead {
+        position: sticky;
+        top: 0;
+        background-color: @grey1;
+      }
+
+      th, td {
+        text-align: left;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding: 4px 8px;
+
+        min-width: 100px; // TEMP
+        max-width: 200px; // TEMP
+      }
+
+      th:not(:last-child) {
+        border-right: 2px solid @grey2;
+      }
+
+      tbody tr:nth-child(odd) {
+        background-color: @grey2;
+      }
+
+      td.empty {
+        text-align: center;
+        font-style: italic;
+        font-size: .9em;
+      }
+
+      tr.current {
+        color: @cyan;
+        font-weight: bold;
+      }
+    }
+
+  }
+}

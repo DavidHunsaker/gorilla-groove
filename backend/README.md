@@ -15,6 +15,8 @@ Edit `/config/application.properties` and set `spring.datasource.username` and `
 
 If your MySQL is running on localhost with port 3306, then you are done. If it isn't, edit `spring.datasource.url` to be accurate for your database's IP and port
 
+If you have trouble running locally and you get an error with MySQL like "Public Key Retrieval is not allowed", try adding `&allowPublicKeyRetrieval=true` to the end of your `spring.datasource.url` in `config/application.properties`
+
 ### FFmpeg
 
 FFmpeg is used to convert files to OGG format. It will need to be installed from https://www.ffmpeg.org/download.html. If given a choice, install the "full" release build.
