@@ -55,7 +55,7 @@ class DeviceService(
 				'P' to listOf("Paranoid", "Paranormal", "Passable", "Passionate", "Passive", "Patient", "Pathetic", "Peaceful", "Peculiar", "Pedantic", "Perky", "Perplexing", "Petite"),
 				'S' to listOf("Sacred", "Sad", "Sadistic", "Salty", "Sane", "Sassy", "Satisfying", "Saucy", "Scandalous", "Skeptical", "Scholarly", "Scattered", "Secretive", "Seductive", "Sincere")
 		)
-		val characterNames = listOf("Gollum", "Frodo", "Samwise", "Aragorn", "Legolas", "Gandolf", "Sauron", "Arwen", "Bilbo", "Gimli", "Boromir", "Faramir", "Merry", "Pippin")
+		val characterNames = listOf("Gollum", "Frodo", "Samwise", "Aragorn", "Legolas", "Gandalf", "Sauron", "Arwen", "Bilbo", "Gimli", "Boromir", "Faramir", "Merry", "Pippin")
 
 		val characterName = characterNames.random()
 		val adjective = adjectivesByLetter[characterName.first().toUpperCase()]?.random() ?: ""
