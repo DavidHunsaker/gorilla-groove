@@ -18,6 +18,7 @@
 
 @import 'components/Login/login';
 @import 'components/MainPage/main';
+@import 'components/MainPage/TrackList/trackList';
 
 .blue-background() {
   background-color: @dark-blue;
@@ -35,10 +36,10 @@
 
 @keyframes spin {
   from {
-    transform:rotate(0deg);
+    transform: rotate(0deg);
   }
   to {
-    transform:rotate(360deg);
+    transform: rotate(360deg);
   }
 }
 
@@ -49,7 +50,7 @@
   animation-timing-function: linear;
 }
 
-body.beta {  // TODO: remove this namespacing
+body.beta { // TODO: remove this namespacing
   .blue-background();
 
   .beta-warning {
@@ -92,6 +93,7 @@ body.beta {  // TODO: remove this namespacing
 
     div {
       display: inline-block;
+
       h1 {
         font-size: 1.25em;
         margin: 0;
@@ -107,6 +109,27 @@ body.beta {  // TODO: remove this namespacing
         margin: 4px 0;
         line-height: 1.25em;
       }
+    }
+  }
+
+  .modal {
+    .grey-background();
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+
+    .modal-close {
+      position: absolute;
+      right: 3px;
+      top: 0;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .modal-image {
+      width: 500px;
     }
   }
 
@@ -164,6 +187,26 @@ body.beta {  // TODO: remove this namespacing
         text-decoration: underline;
       }
     }
+
+    &.icon {
+      color: white;
+      background-color: transparent;
+      padding: 4px;
+      margin: 0 8px;
+
+      &.active {
+        color: lighten(@blue, 10%);
+
+        &:hover {
+          color: lighten(@blue, 20%);
+        }
+      }
+
+      &:hover, &:focus-visible {
+        background-color: transparent;
+        color: @cyan;
+      }
+    }
   }
 
   input {
@@ -174,6 +217,166 @@ body.beta {  // TODO: remove this namespacing
 
     &:focus-visible {
       outline: 3px solid @blue;
+    }
+
+    &[type=range] {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+
+      padding: 0;
+      margin: 0;
+      width: 100%;
+      height: 1em;
+      background: 0 0;
+      border: none;
+      font-size: 14px;
+
+      .range-track() {
+        height: 100%;
+        border: none;
+        background-color: white;
+      }
+      .range-progress() {
+        height: 100%;
+      }
+      .range-thumb() {
+        width: 10px;
+        height: 100%;
+        border-radius: 0;
+        border: none;
+        background-color: #1D87BA;
+      }
+
+      &::-moz-range-track {
+        .range-track();
+      }
+
+      &::-webkit-slider-runnable-track {
+        .range-track();
+      }
+
+      &::-moz-range-progress {
+        .range-progress();
+      }
+
+      &::-moz-range-thumb {
+        .range-thumb();
+      }
+
+      &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        .range-thumb();
+      }
+
+      &:disabled {
+        &::-moz-range-track {
+          background-color: @grey4;
+        }
+
+        &::-webkit-slider-runnable-track {
+          background-color: @grey4;
+        }
+
+        &::-moz-range-progress {
+          background-color: @grey4;
+        }
+
+        &::-moz-range-thumb {
+          background-color: @grey5;
+        }
+
+        &::-webkit-slider-thumb {
+          background-color: @grey5;
+        }
+      }
+    }
+  }
+
+  progress {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    border: none;
+    width: 100%;
+    height: 1em;
+    background-color: @grey3;
+
+    .progress-bar() {
+      background-color: white;
+      border-right: 10px solid @blue; // replaces a range inputs "thumb"
+    }
+
+    &[value] {
+      &::-moz-progress-bar {
+        .progress-bar();
+      }
+
+      &::-webkit-progress-value {
+        .progress-bar();
+      }
+    }
+
+    &:indeterminate {
+      &::-moz-progress-bar {
+        background-color: @grey3;
+        border-right: none; // replaces a range inputs "thumb"
+      }
+
+      &::-webkit-progress-value {
+        background-color: @grey3;
+        border-right: none; // replaces a range inputs "thumb"
+      }
+    }
+  }
+
+
+  // Styles for MusicControls component
+  .music-control {
+    display: flex;
+    flex-direction: column;
+
+    & > .button-box {
+      flex: 0 0 auto;
+      display: flex;
+      justify-content: space-between;
+      width: 310px;
+      margin-top: 8px;
+
+      & > div {
+        display: flex;
+        align-items: center;
+      }
+
+      button:first-child {
+        margin-left: 0;
+      }
+    }
+
+    & > .seeker {
+      width: 350px;
+      margin: 8px 0;
+
+      progress {
+        margin-top: 4px;
+      }
+    }
+
+    & > .volume {
+      display: flex;
+      align-items: center;
+
+      .volume-indicator {
+        display: inline-block;
+        width: 36px;
+        text-align: left;
+        margin-left: 0;
+      }
+
+      input[type=range] {
+        width: 150px;
+      }
     }
   }
 }

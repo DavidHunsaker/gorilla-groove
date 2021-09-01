@@ -4,6 +4,7 @@ body.beta { // TODO: remove this namespacing
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
     img {
       flex: 0 0 auto;
 
@@ -19,21 +20,53 @@ body.beta { // TODO: remove this namespacing
       flex: 1 0 auto;
       display: flex;
       overflow: hidden;
-      height: calc(100% - 180px);  // height of footer
+      height: calc(100% - 180px); // height of footer
 
-      .nav {
+      nav {
         .panel-shadow();
         width: 230px;
-        padding: 10px;
+        padding: 10px 0;
         flex: 0 0 auto;
+        overflow: auto;
+        z-index: 1;  // without this, the nav will not have a shadow because it's under the .panel
+
+        .navigable-item {
+          position: relative;
+          margin: 8px 0;
+          padding: 4px 0 4px 20px;
+
+          a {
+            text-decoration: none;
+            color: white;
+
+            &.current {
+              font-weight: bold;
+              color: @cyan;
+
+              &:before {
+                content: '';
+                position: absolute;
+                border-left: 8px solid @cyan;
+                height: 100%;
+                top: 0;
+                left: 0;
+              }
+            }
+          }
+        }
+
+        & > div > .navigable-item {
+          padding-left: 36px;
+        }
       }
 
       .panel {
         background-color: @grey1;
         flex: 1 0 auto;
-        padding: 8px;
-        overflow: auto;
-        width: calc(100% - 276px);  // width of nav + self padding, for some reason
+        padding: 0;  // let the contents of the panel control their padding
+        overflow: hidden;  // let the contents of the panel control their overflow
+        width: calc(100% - 276px); // width of nav + self padding, for some reason
+        height: 100%;
       }
     }
 
@@ -45,7 +78,7 @@ body.beta { // TODO: remove this namespacing
       display: flex;
 
       & div.album-art {
-        flex: 0 0 180px;  // same size as footer
+        flex: 0 0 180px; // same size as footer
         background-size: contain;
         background-repeat: no-repeat;
         background-position: center;

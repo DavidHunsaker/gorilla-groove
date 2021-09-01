@@ -1,48 +1,27 @@
-import React, {useState} from 'react';
-import {Redirect, withRouter} from 'react-router-dom';
-import {getDeviceIdentifier} from '../../../src/services/version';
-import {DeviceType} from '../../../src/enums/device-type';
-import {addCookie} from '../../util/cookie';
-import {Api} from '../../util/api';
-import {isLoggedIn} from '../../util';
+import React, {useContext, useState} from 'react'
+import {Redirect, withRouter} from 'react-router-dom'
+import {isLoggedIn} from '../../util'
+import {GorillaGrooveContext} from '../../context/GorillaGrooveContext'
 
 
 const Login = ({history}) => {
 	if (isLoggedIn()) {
-		return <Redirect to={'/'}/>;
+		return <Redirect to={'/'}/>
 	}
-	const [forgotPassword, setForgotPassword] = useState(false);
+	const [forgotPassword, setForgotPassword] = useState(false)
 
+	const app = useContext(GorillaGrooveContext)
 
 	const submitLogin = async (event) => {
-		event.preventDefault();
-		event.stopPropagation();
+		event.preventDefault()
+		event.stopPropagation()
 
-		const form = event.target;
-
-		const params = {
-			email: form.email.value,
-			password: form.password.value,
-			deviceId: getDeviceIdentifier(),
-			version: __VERSION__,
-			deviceType: DeviceType.WEB
-		};
-
-		try {
-			const {token, email} = await Api.post('authentication/login', params);
-			const ninetyDays = 7776000;
-			addCookie('cookieToken', token, ninetyDays);
-			addCookie('loggedInEmail', email, ninetyDays);
-			history.push('/');
-		} catch (error) {
-			console.error(error);
+		const form = event.target
+		// TODO: i don't like that this returns true
+		if (await app.logIn(form.email.value, form.password.value)) {
+			history.push('/')
 		}
-	};
-
-	// const submitPasswordReset = (event) => {
-	// 	event.preventDefault();
-	// 	event.stopPropagation();
-	// }
+	}
 
 	const renderLoginForm = () => {
 		return (
@@ -62,8 +41,8 @@ const Login = ({history}) => {
 				</form>
 				<button className={'link'} onClick={() => setForgotPassword(true)}>Forgot your password?</button>
 			</>
-		);
-	};
+		)
+	}
 
 	const renderForgotPasswordForm = () => {
 		return (
@@ -73,8 +52,8 @@ const Login = ({history}) => {
 				</p>
 				<button className={'link'} onClick={() => setForgotPassword(false)}>Go back</button>
 			</>
-		);
-	};
+		)
+	}
 
 	return (
 		<div className={'login'}>
@@ -84,7 +63,7 @@ const Login = ({history}) => {
 				{forgotPassword ? renderForgotPasswordForm() : renderLoginForm()}
 			</div>
 		</div>
-	);
-};
+	)
+}
 
-export default withRouter(Login);
+export default withRouter(Login)

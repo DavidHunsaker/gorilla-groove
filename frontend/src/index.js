@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import SiteWrapper from './components/site-wrapper/site-wrapper';
-import GorillaGrooveRoot from '../src2/components/GorillaGrooveRoot';
+import GorillaGrooveRoot from '../src2/GorillaGrooveRoot';
 import * as LocalStorage from './local-storage';
 
 
